@@ -1,6 +1,17 @@
-const mongoose = require("mongoose");
+const winston = require("winston");
+const express = require("express");
+const app = express();
 
-mongoose
-  .connect("mongodb://localhost/playground")
-  .then(() => console.log("connected to mongoDB...."))
-  .catch((err) => console.error("could not connect to MongoDB...", err));
+require("./startup/logging")();
+require("./startup/routes")(app);
+require("./startup/db")();
+require("./startup/config")();
+require("./startup/validation")();
+require("./startup/prod")(app);
+
+const port = process.env.PORT || 3000;
+const server = app.listen(port, () =>
+  winston.info(`Listening on port ${port}...`)
+);
+
+module.exports = server;
